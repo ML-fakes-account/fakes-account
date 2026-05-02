@@ -39,12 +39,7 @@ nombre de posts par jour
 taux d’activité suspect (spam, interactions automatisées)
 
 3) Modélisation
-Tests de plusieurs algorithmes :
-
-Régression Logistique
-Random Forest
-XGBoost
-SVM
+Plusieurs algorithmes supervisés classiques : régression logistique, KNN, arbre de décision, Random Forest, SVM, Naïve Bayes.
 
 4) Évaluation
 
@@ -53,7 +48,16 @@ Accuracy, Precision, Recall, F1-score
 Sélection du meilleur modèle pour l’application
 
 5) Application web
-Interface permettant de :
+Interface HTML / CSS / JavaScript (sans framework) : affichage des métriques, comparaison des modèles, choix du modèle, prédiction (connectée ensuite au backend Python).
 
-Entrer les informations d’un profil
-Obtenir une prédiction → Faux profil / Profil légitime
+---
+
+## Lancer le frontend (fichiers statiques)
+
+À la racine du dépôt, par exemple :
+
+```powershell
+python -m http.server 8080 --directory frontend
+```
+
+Puis ouvrir `http://localhost:8080` dans le navigateur.
