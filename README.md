@@ -59,7 +59,7 @@ Interface HTML / CSS / JavaScript (sans framework) : affichage des métriques, c
 | `data/raw/` | Jeux de données sources (CSV, etc.) — non versionnés si volumineux |
 | `data/processed/` | Données nettoyées / features pour l’entraînement |
 | `models/` | Modèles sauvegardés (`joblib`) après entraînement |
-| `notebooks/` | Notebooks Jupyter (EDA → évaluation) |
+| `notebooks/` | Notebook Jupyter principal : `projet_fake_profiles.ipynb` |
 | `src/` | Utilitaires Python (chemins, chargement CSV) |
 | `backend/` | API Flask (`/api/metrics`, `/api/predict`) |
 | `frontend/` | Interface HTML / CSS / JavaScript |
@@ -82,7 +82,7 @@ pip install -r requirements.txt
 Lancer Jupyter **depuis la racine** `fakes-account` pour que les imports `src.*` fonctionnent :
 
 ```powershell
-jupyter notebook notebooks/
+jupyter notebook notebooks/projet_fake_profiles.ipynb
 ```
 
 Si `pip install -r requirements.txt` échoue sous Windows avec une erreur de chemin trop long, activez la **prise en charge des chemins longs** (paramètres système ou stratégie de groupe), ou réessayez après `pip install --no-cache-dir -r requirements.txt`. En dernier recours, créez un nouveau dossier projet avec un chemin plus court sur le disque.
