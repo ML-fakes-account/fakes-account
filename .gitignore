@@ -1,6 +1,5 @@
 venv/
 .env
-.env.*
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -9,3 +8,11 @@ __pycache__/
 .vscode/
 *.log
 .DS_Store
+
+# Données et artefacts ML (conserver les .gitkeep)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+models/*
+!models/.gitkeep

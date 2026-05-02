@@ -52,12 +52,64 @@ Interface HTML / CSS / JavaScript (sans framework) : affichage des métriques, c
 
 ---
 
-## Lancer le frontend (fichiers statiques)
+## Structure du dépôt
 
-À la racine du dépôt, par exemple :
+| Élément | Rôle |
+|--------|------|
+| `data/raw/` | Jeux de données sources (CSV, etc.) — non versionnés si volumineux |
+| `data/processed/` | Données nettoyées / features pour l’entraînement |
+| `models/` | Modèles sauvegardés (`joblib`) après entraînement |
+| `notebooks/` | Notebooks Jupyter (EDA → évaluation) |
+| `src/` | Utilitaires Python (chemins, chargement CSV) |
+| `backend/` | API Flask (`/api/metrics`, `/api/predict`) |
+| `frontend/` | Interface HTML / CSS / JavaScript |
+
+---
+
+## Environnement Python (Windows)
+
+Python **3.11** ou **3.12** recommandé. À la racine du dépôt :
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Jupyter
+
+Lancer Jupyter **depuis la racine** `fakes-account` pour que les imports `src.*` fonctionnent :
+
+```powershell
+jupyter notebook notebooks/
+```
+
+Si `pip install -r requirements.txt` échoue sous Windows avec une erreur de chemin trop long, activez la **prise en charge des chemins longs** (paramètres système ou stratégie de groupe), ou réessayez après `pip install --no-cache-dir -r requirements.txt`. En dernier recours, créez un nouveau dossier projet avec un chemin plus court sur le disque.
+
+### Backend Flask
+
+Toujours depuis la racine du dépôt :
+
+```powershell
+.\venv\Scripts\Activate.ps1
+python -m flask --app backend.app run --debug
+```
+
+API disponible sur `http://127.0.0.1:5000` — exemples : `GET /api/health`, `GET /api/metrics`, `POST /api/predict` (JSON : `model_id`, `followers`, `following` pour la démo).
+
+### Frontend (fichiers statiques)
+
+Dans un **second** terminal :
 
 ```powershell
 python -m http.server 8080 --directory frontend
 ```
 
-Puis ouvrir `http://localhost:8080` dans le navigateur.
+Ouvrir `http://localhost:8080`. Pour brancher le tableau de bord sur l’API, remplacer dans `frontend/js/app.js` les données statiques par des appels `fetch()` vers `http://127.0.0.1:5000/api/...` (même machine ; attention aux politiques CORS déjà assouplies côté Flask pour le développement).
+
+---
+
+## Fichier de configuration optionnel
+
+Copier `.env.example` vers `.env` si vous centralisez des variables locales (non commitées).
