@@ -17,8 +17,8 @@ Technologies utilisées
 
 Python (Pandas, NumPy, Scikit-learn, Matplotlib/Seaborn)
 Scraping : BeautifulSoup, Selenium, ou API des réseaux sociaux
-Machine Learning : RandomForest, SVM, XGBoost, Logistic Regression
-Web App : Flask / FastAPI / Streamlit
+Machine Learning (Ingé2, ML classique) : régression logistique, KNN, arbre de décision, Random Forest, SVM, Naïve Bayes
+Web : backend Flask ou FastAPI + frontend HTML / CSS / JavaScript (sans framework)
 Versioning : Git & GitHub
 
 Approche méthodologique

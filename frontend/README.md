@@ -1,16 +1,24 @@
-# React + Vite
+# Interface web (HTML, CSS, JavaScript)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Stack volontairement simple pour correspondre aux attendus du cours : pas de framework (pas de React). Les fichiers sont lisibles et commentés pour la soutenance.
 
-Currently, two official plugins are available:
+## Fichiers
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `index.html` — structure de la page (sections performances, comparaison, prédiction).
+- `css/styles.css` — mise en page et thème clair/sombre automatique.
+- `js/app.js` — remplissage du tableau et des barres, liste déroulante des modèles, gestion du formulaire.
 
-## React Compiler
+## Lancement local
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Ouvrir `index.html` dans un navigateur, ou servir le dossier avec un petit serveur statique pour éviter les blocages CORS lors des futurs appels `fetch()` vers l’API Python :
 
-## Expanding the ESLint configuration
+```powershell
+# exemple avec Python 3
+python -m http.server 8080 --directory frontend
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Puis ouvrir `http://localhost:8080`.
+
+## Intégration ultérieure
+
+Remplacer les données d’exemple dans `js/app.js` par des requêtes `fetch()` vers votre backend (Flask ou FastAPI, selon choix du projet).
