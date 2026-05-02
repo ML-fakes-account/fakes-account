@@ -63,6 +63,17 @@ Interface HTML / CSS / JavaScript (sans framework) : affichage des métriques, c
 | `src/` | Utilitaires Python (chemins, chargement CSV) |
 | `backend/` | API Flask (`/api/metrics`, `/api/predict`) |
 | `frontend/` | Interface HTML / CSS / JavaScript |
+| `scripts/` | Utilitaires hors notebook — ex. `make_messy_dataset.py` |
+
+### Jeu « à nettoyer » pour la consigne
+
+Le CSV Kaggle est très propre. Pour exercer **audit + nettoyage** de façon honnête : depuis la racine, après avoir placé `fake_social_media.csv` dans `data/raw/` :
+
+```powershell
+python scripts/make_messy_dataset.py
+```
+
+Cela produit **`fake_social_media_messy.csv`** (doublons, valeurs manquantes, casse hétérogène sur `platform`, outliers). À mentionner dans le rapport comme **dégradation contrôlée à visée pédagogique** (graine fixée dans le script).
 
 ---
 
