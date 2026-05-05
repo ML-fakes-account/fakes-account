@@ -1,116 +1,70 @@
-"""Application Flask : santé de l’API, métriques de démonstration, prédiction factice."""
-
 from __future__ import annotations
-
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from pathlib import Path
+import numpy as np
+import joblib
+from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+MODELS_DIR = Path(__file__).parent.parent / "models"
+MODEL_PATH = MODELS_DIR / "random_forest.joblib"
+MODEL = joblib.load(MODEL_PATH) if MODEL_PATH.exists() else None
 
-# Données factices alignées sur la structure attendue par le frontend (voir frontend/js/app.js).
-# À remplacer par la lecture des résultats réels (fichier JSON ou base) après entraînement.
-METRICS_STUB = [
-    {
-        "id": "logistic_regression",
-        "label": "Régression logistique",
-        "accuracy": 0.82,
-        "precision": 0.79,
-        "recall": 0.76,
-        "f1": 0.775,
-    },
-    {
-        "id": "knn",
-        "label": "KNN",
-        "accuracy": 0.8,
-        "precision": 0.77,
-        "recall": 0.74,
-        "f1": 0.755,
-    },
-    {
-        "id": "decision_tree",
-        "label": "Arbre de décision",
-        "accuracy": 0.78,
-        "precision": 0.75,
-        "recall": 0.73,
-        "f1": 0.74,
-    },
-    {
-        "id": "random_forest",
-        "label": "Random Forest",
-        "accuracy": 0.85,
-        "precision": 0.83,
-        "recall": 0.81,
-        "f1": 0.82,
-    },
-    {
-        "id": "svm",
-        "label": "SVM",
-        "accuracy": 0.83,
-        "precision": 0.81,
-        "recall": 0.78,
-        "f1": 0.795,
-    },
-    {
-        "id": "naive_bayes",
-        "label": "Naïve Bayes",
-        "accuracy": 0.76,
-        "precision": 0.73,
-        "recall": 0.71,
-        "f1": 0.72,
-    },
+FEATURES = [
+    "followers_count", "favourites_count", "friends_count", "statuses_count",
+    "average_tweets_per_day", "account_age_days", "description", "location",
+    "lang", "verified", "geo_enabled", "default_profile"
 ]
 
+HTML = """
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Détection faux profils</title></head>
+<body>
+  <h1>Détection de faux profils Twitter</h1>
+  <form method="POST">
+    <p>Followers : <input type="number" name="followers_count" value="{{ vals.followers_count }}"></p>
+    <p>Comptes suivis : <input type="number" name="friends_count" value="{{ vals.friends_count }}"></p>
+    <p>Nombre de tweets : <input type="number" name="statuses_count" value="{{ vals.statuses_count }}"></p>
+    <p>Tweets par jour : <input type="number" name="average_tweets_per_day" step="0.01" value="{{ vals.average_tweets_per_day }}"></p>
+    <p>Age du compte (jours) : <input type="number" name="account_age_days" value="{{ vals.account_age_days }}"></p>
+    <p>Nombre total de tweets likés depuis la création : <input type="number" name="favourites_count" value="{{ vals.favourites_count }}"></p>
+    <p>Compte vérifié : <input type="checkbox" name="verified" value="1" {{ 'checked' if vals.verified else '' }}></p>
+    <p>Profil par défaut : <input type="checkbox" name="default_profile" value="1" {{ 'checked' if vals.default_profile else '' }}></p>
+    <p>Géolocalisation activée : <input type="checkbox" name="geo_enabled" value="1" {{ 'checked' if vals.geo_enabled else '' }}></p>
+    <p><input type="submit" value="Analyser"></p>
+  </form>
+  {% if verdict %}
+    <h2>Résultat : {{ verdict }}</h2>
+  {% endif %}
+</body>
+</html>
+"""
 
-@app.get("/api/health")
-def health():
-    return jsonify({"status": "ok"})
+@app.route("/", methods=["GET", "POST"])
+def index():
+    verdict = None
+    vals = {f: "" for f in FEATURES}
 
+    if request.method == "POST":
+        vals["followers_count"]        = request.form.get("followers_count", 0)
+        vals["friends_count"]          = request.form.get("friends_count", 0)
+        vals["statuses_count"]         = request.form.get("statuses_count", 0)
+        vals["average_tweets_per_day"] = request.form.get("average_tweets_per_day", 0)
+        vals["account_age_days"]       = request.form.get("account_age_days", 0)
+        vals["favourites_count"]       = request.form.get("favourites_count", 0)
+        vals["verified"]               = 1 if request.form.get("verified") else 0
+        vals["default_profile"]        = 1 if request.form.get("default_profile") else 0
+        vals["geo_enabled"]            = 1 if request.form.get("geo_enabled") else 0
+        vals["description"]            = 0
+        vals["location"]               = 0
+        vals["lang"]                   = 0
 
-@app.get("/api/metrics")
-def metrics():
-    return jsonify({"models": METRICS_STUB})
+        features = np.array([[float(vals[f] or 0) for f in FEATURES]])
+        pred = MODEL.predict(features)[0]
+        verdict = "Faux profil" if pred == 1 else "Profil réel"
 
-
-@app.post("/api/predict")
-def predict():
-    """Placeholder : charger les ``.joblib`` depuis ``models/`` quand ils existent."""
-    payload = request.get_json(silent=True) or {}
-    model_id = payload.get("model_id", "")
-    followers = payload.get("followers")
-    following = payload.get("following")
-
-    known = {m["id"]: m["label"] for m in METRICS_STUB}
-    if model_id not in known:
-        return jsonify({"error": "model_id inconnu", "known": list(known.keys())}), 400
-
-    demo_score = 0
-    if followers is not None and following is not None:
-        try:
-            demo_score = (int(followers) + int(following)) % 2
-        except (TypeError, ValueError):
-            demo_score = 0
-
-    verdict = (
-        "Profil probablement faux (démonstration)"
-        if demo_score > 0
-        else "Profil probablement authentique (démonstration)"
-    )
-
-    return jsonify(
-        {
-            "model_id": model_id,
-            "model_label": known[model_id],
-            "verdict": verdict,
-            "note": "Remplacer par la probabilité ou la classe prédite par scikit-learn.",
-        }
-    )
-
-
-def create_app():
-    return app
-
+    return render_template_string(HTML, verdict=verdict, vals=vals)
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
