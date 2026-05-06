@@ -14,8 +14,8 @@ SCALER = joblib.load(SCALER_PATH) if SCALER_PATH.exists() else None
 
 FEATURES = [
     "followers_count", "favourites_count", "friends_count", "statuses_count",
-    "average_tweets_per_day", "account_age_days", "description", "location",
-    "lang", "verified", "geo_enabled", "default_profile"
+    "average_tweets_per_day", "account_age_days", "verified", "geo_enabled",
+    "default_profile"
 ]
 
 HTML = """
@@ -56,12 +56,8 @@ def index():
         vals["account_age_days"]       = request.form.get("account_age_days", 0)
         vals["favourites_count"]       = request.form.get("favourites_count", 0)
         vals["verified"]               = 1 if request.form.get("verified") else 0
-        vals["default_profile"]        = 1 if request.form.get("default_profile") else 0
         vals["geo_enabled"]            = 1 if request.form.get("geo_enabled") else 0
-        vals["description"]            = 0
-        vals["location"]               = 0
-        vals["lang"]                   = 0
-
+        vals["default_profile"]        = 1 if request.form.get("default_profile") else 0
         features = np.array([[float(vals[f] or 0) for f in FEATURES]])
         features = SCALER.transform(features)
         pred = MODEL.predict(features)[0]
