@@ -7,8 +7,10 @@ from flask import Flask, request, render_template_string
 app = Flask(__name__)
 
 MODELS_DIR = Path(__file__).parent.parent / "models"
-MODEL_PATH = MODELS_DIR / "random_forest.joblib"
-MODEL = joblib.load(MODEL_PATH) if MODEL_PATH.exists() else None
+MODEL_PATH  = MODELS_DIR / "random_forest.joblib"
+SCALER_PATH = MODELS_DIR / "scaler.joblib"
+MODEL  = joblib.load(MODEL_PATH)  if MODEL_PATH.exists()  else None
+SCALER = joblib.load(SCALER_PATH) if SCALER_PATH.exists() else None
 
 FEATURES = [
     "followers_count", "favourites_count", "friends_count", "statuses_count",
@@ -61,6 +63,7 @@ def index():
         vals["lang"]                   = 0
 
         features = np.array([[float(vals[f] or 0) for f in FEATURES]])
+        features = SCALER.transform(features)
         pred = MODEL.predict(features)[0]
         verdict = "Faux profil" if pred == 1 else "Profil réel"
 
