@@ -15,6 +15,7 @@ SCALER = joblib.load(SCALER_PATH) if SCALER_PATH.exists() else None
 FEATURES = [
     "followers_count", "favourites_count", "friends_count", "statuses_count",
     "average_tweets_per_day", "account_age_days", "verified", "geo_enabled",
+    "default_profile"
 ]
 
 HTML = """
@@ -31,6 +32,7 @@ HTML = """
     <p>Age du compte (jours) : <input type="number" name="account_age_days" value="{{ vals.account_age_days }}"></p>
     <p>Nombre total de tweets likés depuis la création : <input type="number" name="favourites_count" value="{{ vals.favourites_count }}"></p>
     <p>Compte vérifié : <input type="checkbox" name="verified" value="1" {{ 'checked' if vals.verified else '' }}></p>
+    <p>Profil par défaut : <input type="checkbox" name="default_profile" value="1" {{ 'checked' if vals.default_profile else '' }}></p>
     <p>Géolocalisation activée : <input type="checkbox" name="geo_enabled" value="1" {{ 'checked' if vals.geo_enabled else '' }}></p>
     <p><input type="submit" value="Analyser"></p>
   </form>
@@ -55,7 +57,7 @@ def index():
         vals["favourites_count"]       = request.form.get("favourites_count", 0)
         vals["verified"]               = 1 if request.form.get("verified") else 0
         vals["geo_enabled"]            = 1 if request.form.get("geo_enabled") else 0
-
+        vals["default_profile"]        = 1 if request.form.get("default_profile") else 0
         features = np.array([[float(vals[f] or 0) for f in FEATURES]])
         features = SCALER.transform(features)
         pred = MODEL.predict(features)[0]
